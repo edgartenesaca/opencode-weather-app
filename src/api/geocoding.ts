@@ -1,4 +1,4 @@
-import type { City } from "../types";
+import type { City } from "../types/City";
 import { fetchJson } from "./client";
 
 const GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search";
@@ -36,4 +36,3 @@ export async function searchCities(name: string): Promise<City[]> {
     longitude: result.longitude,
   }));
 }
-

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { SPINNER_FRAMES, startSpinner, withSpinner } from "../src/ui/spinner";
+import { SPINNER_FRAMES, startSpinner, withSpinner } from "../src/presentation/spinner";
 
 interface Writable {
   write: (chunk: string) => boolean;

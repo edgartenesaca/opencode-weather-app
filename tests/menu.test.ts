@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { MENU } from "../src/menu";
-import type { AppContext } from "../src/context";
-import { DEFAULT_CONFIG } from "../src/config";
+import { findOption, menuEntries, renderMenu } from "../src/presentation/menu";
+import { DEFAULT_CONFIG } from "../src/storage/settingsStorage";
+import type { AppContext } from "../src/types/AppContext";
 
 const ctx: AppContext = {
   terminal: {} as AppContext["terminal"],
@@ -11,26 +11,37 @@ const ctx: AppContext = {
 
 describe("menú", () => {
   test("las claves son únicas", () => {
-    const keys = MENU.map((option) => option.key);
+    const keys = menuEntries(ctx).map((entry) => entry.key);
 
     expect(new Set(keys).size).toBe(keys.length);
   });
 
   test("incluye la opción de salida", () => {
-    const exit = MENU.find((option) => option.key === "9");
+    const exit = findOption("9");
 
     expect(exit).toBeDefined();
     expect(exit && "exit" in exit).toBe(true);
   });
 
   test("las etiquetas reflejan el estado actual", () => {
-    const citiesLabel = MENU.find((option) => option.key === "2");
-    const unitLabel = MENU.find((option) => option.key === "8");
+    const citiesLabel = findOption("2");
+    const unitLabel = findOption("8");
 
     expect(citiesLabel?.label(ctx)).toBe("Clima de todas las ciudades (0)");
     expect(unitLabel?.label(ctx)).toBe("Ajustes (°C)");
     expect(unitLabel?.label({ ...ctx, config: { ...ctx.config, unit: "fahrenheit" } })).toBe(
       "Ajustes (°F)",
     );
+  });
+
+  test("renderMenu lista las opciones con su número y etiqueta", () => {
+    const output = renderMenu([
+      { key: "1", label: "Clima de ciudad default" },
+      { key: "9", label: "Salir" },
+    ]);
+
+    expect(output).toContain("1. Clima de ciudad default");
+    expect(output).toContain("9. Salir");
+    expect(output).toContain("WEATHER CLI");
   });
 });

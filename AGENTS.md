@@ -2,12 +2,12 @@
 
 ## Overview
 
-Console weather app (Spanish UI) built with Bun + TypeScript on OpenMeteo's APIs. The CLI is implemented: `index.ts` boots the app in `src/`.
+Console weather app (Spanish UI) built with Bun + TypeScript on OpenMeteo's APIs. The CLI is implemented: `src/index.ts` is the entrypoint.
 
 ## Commands
 
 - Install: `bun install`
-- Run: `bun run start` (or `bun run index.ts`)
+- Run: `bun run start` (or `bun run src/index.ts`)
 - Build binary: `bun run build` → `./weather`
 - Typecheck: `bun run typecheck` → `bun check` (uses `typescript` peerDependency, strictly strict tsconfig with `noUncheckedIndexedAccess`)
 - Tests: `bun run test` → `bun test` (Bun test runner, files in `tests/`)
@@ -17,28 +17,48 @@ Console weather app (Spanish UI) built with Bun + TypeScript on OpenMeteo's APIs
 Two-step OpenMeteo flow (see README example URLs):
 1. Geocoding: `https://geocoding-api.open-meteo.com/v1/search?name=<city>&count=5&language=es&format=json` → lat/lon
 2. Forecast: `https://api.open-meteo.com/v1/forecast?latitude=...&longitude=...&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m`
+3. Daily forecast: `https://api.open-meteo.com/v1/forecast?latitude=...&longitude=...&daily=weather_code,temperature_2m_max,temperature_2m_min&forecast_days=7&timezone=auto`
 
 No API key needed. No HTTP client dependency is installed — use Bun's built-in `fetch`.
 
 ```
-index.ts              entrypoint
-src/app.ts            menu loop + dispatch (reads the MENU table)
-src/menu.ts           declarative menu table (key, label, action)
-src/actions.ts        one handler per menu option
-src/context.ts        AppContext + createContext (single write path: updateConfig)
-src/config.ts         load/save config (XDG path) + validation
-src/types.ts          City, CurrentWeather, Config
-src/units.ts          Unit type, symbols, API mapping, isUnit/nextUnit
-src/weather-codes.ts  WMO code → description/icon
-src/errors.ts         WeatherError
-src/api/client.ts     fetch + timeout + error mapping
-src/api/geocoding.ts  city search
-src/api/forecast.ts   current weather (temperature, humidity, code, wind) + 7-day forecast
-src/ui/terminal.ts    line reader
-src/ui/prompts.ts     index/yes-no prompts
-src/ui/spinner.ts     loading spinner (con fallback estático fuera de TTY)
-src/ui/weather.ts     menu and weather rendering
-tests/                bun test suites (config, units, menu, renderers)
+src/
+├── index.ts              entrypoint: menu loop + dispatch + createContext
+├── actions/              one handler per user action
+│   ├── getWeather.ts      clima de la ciudad default
+│   ├── listCities.ts      clima de todas las ciudades
+│   ├── addCity.ts         buscar y agregar ciudad
+│   ├── removeCity.ts      eliminar ciudad
+│   ├── setDefaultCity.ts  establecer ciudad default
+│   ├── getForecast.ts     pronóstico de 7 días
+│   └── changeUnit.ts      alternar °C/°F
+├── presentation/         everything that touches the console
+│   ├── menu.ts            MENU table + rendering + option lookup
+│   ├── output.ts          renderers and user-facing messages
+│   ├── input.ts           Terminal (line reader) + askIndex/confirm
+│   └── spinner.ts         loading spinner (static fallback outside TTY)
+├── storage/              local persistence
+│   ├── settingsStorage.ts config.json: XDG path, load/save, validation
+│   └── citiesStorage.ts   pure city helpers (add/remove/default) as config patches
+├── types/                global contracts (one per file, PascalCase)
+│   ├── AppContext.ts      terminal + config + updateConfig
+│   ├── City.ts
+│   ├── Config.ts
+│   ├── MenuOption.ts
+│   ├── Unit.ts
+│   └── Weather.ts         CurrentWeather, DailyForecast
+├── api/                  external integrations
+│   ├── client.ts          fetch + timeout + error mapping
+│   ├── geocoding.ts       city search
+│   └── weather.ts         current weather + 7-day forecast
+├── utils/                reusable helpers
+│   ├── colors.ts          ANSI colors (disabled when stdout is not a TTY)
+│   ├── constants.ts       line width, separators
+│   ├── errors.ts          WeatherError
+│   ├── format.ts          date/temperature formatters
+│   ├── units.ts           unit symbols, API mapping, isUnit/nextUnit
+│   └── weatherCodes.ts    WMO code → description/icon
+tests/                    bun test suites (storage, api, presentation, utils)
 ```
 
 Settings persist in `$XDG_CONFIG_HOME/weather-cli/config.json` (`~/.config/weather-cli/config.json` by default).
@@ -47,10 +67,10 @@ Settings persist in `$XDG_CONFIG_HOME/weather-cli/config.json` (`~/.config/weath
 
 - User-facing strings (UI, menu, prompts) are in Spanish, matching the README's mock menu; code identifiers in English.
 - Settings (default city, cities list, units) persist locally in JSON.
-- Input is read through `src/ui/terminal.ts` (readline `line` events) instead of `readline/promises`, because Bun discards lines typed between questions.
-- Adding a menu option = adding one entry to `MENU` in `src/menu.ts`; the menu rendering and dispatch are driven by that table.
-- Config mutations go through `ctx.updateConfig(patch)`; never mutate `ctx.config` directly.
-- Network calls are wrapped with `withSpinner(text, task)` from `src/ui/spinner.ts` so the UI always shows progress and never leaves a dangling spinner.
+- Input is read through `Terminal` in `src/presentation/input.ts` (readline `line` events) instead of `readline/promises`, because Bun discards lines typed between questions.
+- Adding a menu option = new file in `src/actions/` + one entry in `MENU` in `src/presentation/menu.ts`; rendering and dispatch are driven by that table.
+- Config mutations go through `ctx.updateConfig(patch)`; never mutate `ctx.config` directly. City changes come from the helpers in `src/storage/citiesStorage.ts`.
+- Network calls are wrapped with `withSpinner(text, task)` from `src/presentation/spinner.ts` so the UI always shows progress and never leaves a dangling spinner.
 
 
 - Puedes usar @bun-instruction para instrucciones de bun

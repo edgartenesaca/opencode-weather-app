@@ -1,6 +1,8 @@
-import { WeatherError } from "../errors";
-import type { City, CurrentWeather, DailyForecast } from "../types";
-import { toApiUnit, type Unit } from "../units";
+import type { City } from "../types/City";
+import type { Unit } from "../types/Unit";
+import type { CurrentWeather, DailyForecast } from "../types/Weather";
+import { toApiUnit } from "../utils/units";
+import { WeatherError } from "../utils/errors";
 import { fetchJson } from "./client";
 
 const FORECAST_URL = "https://api.open-meteo.com/v1/forecast";

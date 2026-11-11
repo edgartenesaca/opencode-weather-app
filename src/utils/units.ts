@@ -1,6 +1,4 @@
-export const UNITS = ["celsius", "fahrenheit"] as const;
-
-export type Unit = (typeof UNITS)[number];
+import { UNITS, type Unit } from "../types/Unit";
 
 const SYMBOLS: Record<Unit, string> = {
   celsius: "°C",

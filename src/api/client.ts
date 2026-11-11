@@ -1,4 +1,4 @@
-import { WeatherError } from "../errors";
+import { WeatherError } from "../utils/errors";
 
 const REQUEST_TIMEOUT_MS = 10_000;
 

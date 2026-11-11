@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { getCurrentWeather, getDailyForecast } from "../src/api/forecast";
-import { WeatherError } from "../src/errors";
-import type { City } from "../src/types";
+import { getCurrentWeather, getDailyForecast } from "../src/api/weather";
+import { WeatherError } from "../src/utils/errors";
+import type { City } from "../src/types/City";
 
 const city: City = {
   id: 6094817,

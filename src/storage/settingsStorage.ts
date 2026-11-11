@@ -1,8 +1,9 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import type { City, Config } from "./types";
-import { isUnit } from "./units";
+import type { City } from "../types/City";
+import type { Config } from "../types/Config";
+import { isUnit } from "../utils/units";
 
 const APP_FOLDER = "weather-cli";
 const CONFIG_FILE = "config.json";

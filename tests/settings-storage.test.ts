@@ -1,9 +1,14 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { homedir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_CONFIG, getConfigPath, loadConfig, parseConfig, saveConfig } from "../src/config";
+import {
+  DEFAULT_CONFIG,
+  getConfigPath,
+  loadConfig,
+  parseConfig,
+  saveConfig,
+} from "../src/storage/settingsStorage";
 
 const validCity = {
   id: 3658666,

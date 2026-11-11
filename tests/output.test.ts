@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import type { City, CurrentWeather } from "../src/types";
-import { cityLabel, renderCityList, renderMenu, renderWeather } from "../src/ui/weather";
-import { describeWeatherCode } from "../src/weather-codes";
+import type { City } from "../src/types/City";
+import type { CurrentWeather, DailyForecast } from "../src/types/Weather";
+import { cityLabel, renderCityList, renderDailyForecast, renderWeather } from "../src/presentation/output";
+import { describeWeatherCode } from "../src/utils/weatherCodes";
 
 const city: City = {
   id: 3658666,
@@ -18,6 +19,12 @@ const weather: CurrentWeather = {
   windSpeed: 9.4,
   weatherCode: 3,
 };
+
+const days: DailyForecast[] = [
+  { date: "2026-11-11", max: 6.9, min: 0.5, weatherCode: 3 },
+  { date: "2026-11-12", max: 3.4, min: -0.2, weatherCode: 61 },
+  { date: "2026-11-13", max: 5.8, min: -0.4, weatherCode: 0 },
+];
 
 describe("renderWeather", () => {
   test("muestra temperatura con la unidad indicada", () => {
@@ -45,22 +52,35 @@ describe("renderWeather", () => {
   });
 });
 
-describe("renderMenu", () => {
-  test("lista las opciones con su número y etiqueta", () => {
-    const output = renderMenu([
-      { key: "1", label: "Clima de ciudad default" },
-      { key: "9", label: "Salir" },
-    ]);
-
-    expect(output).toContain("1. Clima de ciudad default");
-    expect(output).toContain("9. Salir");
-    expect(output).toContain("WEATHER CLI");
-  });
-});
-
 describe("renderCityList", () => {
   test("enumera las ciudades", () => {
     expect(renderCityList([city])).toBe("  1. Cuenca, Azuay, Ecuador");
+  });
+});
+
+describe("renderDailyForecast", () => {
+  test("muestra encabezado, días y temperaturas", () => {
+    const output = renderDailyForecast(city, days, "celsius");
+
+    expect(output).toContain("Pronóstico de 3 días");
+    expect(output).toContain("Cuenca, Azuay, Ecuador");
+    expect(output).toContain("(°C)");
+    expect(output).toContain("6.9° / 0.5°");
+    expect(output).toContain("3.4° / -0.2°");
+  });
+
+  test("incluye la descripción del clima por código WMO", () => {
+    const output = renderDailyForecast(city, days, "celsius");
+
+    expect(output).toContain("Cielo nublado");
+    expect(output).toContain("Lluvia ligera");
+    expect(output).toContain("Cielo despejado");
+  });
+
+  test("omite la descripción cuando no hay código", () => {
+    const output = renderDailyForecast(city, [{ date: "2026-11-11", max: 1, min: 0 }], "celsius");
+
+    expect(output).toContain("Sin datos");
   });
 });
 
