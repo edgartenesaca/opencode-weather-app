@@ -46,3 +46,34 @@ Esta es la apariencia que deseamos crear
 ════════════════════════════════════════
   Selecciona una opción: 5
 ```
+
+### Uso
+
+```bash
+bun install
+bun run start        # ejecuta la app
+bun run build        # genera el binario ./weather
+bun run typecheck    # bun check
+```
+
+### Configuración
+
+Las ciudades, la ciudad default y la unidad de temperatura se guardan en
+`$XDG_CONFIG_HOME/weather-cli/config.json` (`~/.config/weather-cli/config.json` por defecto):
+
+```json
+{
+  "unit": "celsius",
+  "defaultCityId": 6094817,
+  "cities": [
+    {
+      "id": 6094817,
+      "name": "Ottawa",
+      "admin1": "Ontario",
+      "country": "Canadá",
+      "latitude": 45.41117,
+      "longitude": -75.69812
+    }
+  ]
+}
+```
