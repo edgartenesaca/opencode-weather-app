@@ -13,7 +13,8 @@ export const DEFAULT_CONFIG: Config = {
 };
 
 export function getConfigPath(): string {
-  const baseDirectory = process.env.XDG_CONFIG_HOME ?? join(homedir(), ".config");
+  const xdgBase = process.env.XDG_CONFIG_HOME?.trim();
+  const baseDirectory = xdgBase ? xdgBase : join(homedir(), ".config");
   return join(baseDirectory, APP_FOLDER, CONFIG_FILE);
 }
 
