@@ -10,7 +10,7 @@ Console weather app (Spanish UI) built with Bun + TypeScript on OpenMeteo's APIs
 - Run: `bun run start` (or `bun run src/index.ts`)
 - Build binary: `bun run build` → `./weather`
 - Typecheck: `bun run typecheck` → `bun check` (uses `typescript` peerDependency, strictly strict tsconfig with `noUncheckedIndexedAccess`)
-- Tests: `bun run test` → `bun test` (Bun test runner, files in `tests/`)
+- Tests: `bun run test` → `bun test` (Bun test runner, files in `test/`). El build (`bun run build`) corre typecheck + tests antes de compilar: si alguno falla, no se genera el binario.
 
 ## Architecture / Flow
 
@@ -58,7 +58,12 @@ src/
 │   ├── format.ts          date/temperature formatters
 │   ├── units.ts           unit symbols, API mapping, isUnit/nextUnit
 │   └── weatherCodes.ts    WMO code → description/icon
-tests/                    bun test suites (storage, api, presentation, utils)
+test/                      espeja la estructura de src/ (un test por módulo)
+├── actions/               un test por acción del menú + helpers.ts (ctx, mocks de fetch/terminal)
+├── api/                   client, geocoding, weather
+├── presentation/          menu, output, spinner
+├── storage/               settings-storage, cities-storage
+└── utils/                 units, errors, weather-codes
 ```
 
 Settings persist in `$XDG_CONFIG_HOME/weather-cli/config.json` (`~/.config/weather-cli/config.json` by default).

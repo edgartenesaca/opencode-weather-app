@@ -8,7 +8,7 @@ import {
   loadConfig,
   parseConfig,
   saveConfig,
-} from "../src/storage/settingsStorage";
+} from "../../src/storage/settingsStorage";
 
 const validCity = {
   id: 3658666,

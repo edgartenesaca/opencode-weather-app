@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { findOption, menuEntries, renderMenu } from "../src/presentation/menu";
-import { DEFAULT_CONFIG } from "../src/storage/settingsStorage";
-import type { AppContext } from "../src/types/AppContext";
+import { findOption, menuEntries, renderMenu } from "../../src/presentation/menu";
+import { DEFAULT_CONFIG } from "../../src/storage/settingsStorage";
+import type { AppContext } from "../../src/types/AppContext";
 
 const ctx: AppContext = {
   terminal: {} as AppContext["terminal"],

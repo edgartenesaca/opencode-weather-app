@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { addedCity, defaultCitySet, findDefaultCity, removedCity } from "../src/storage/citiesStorage";
-import type { City } from "../src/types/City";
-import type { Config } from "../src/types/Config";
+import { addedCity, defaultCitySet, findDefaultCity, removedCity } from "../../src/storage/citiesStorage";
+import type { City } from "../../src/types/City";
+import type { Config } from "../../src/types/Config";
 
 const city: City = {
   id: 6094817,

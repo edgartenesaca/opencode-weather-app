@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import type { City } from "../src/types/City";
-import type { CurrentWeather, DailyForecast } from "../src/types/Weather";
-import { cityLabel, renderCityList, renderDailyForecast, renderWeather } from "../src/presentation/output";
-import { describeWeatherCode } from "../src/utils/weatherCodes";
+import type { City } from "../../src/types/City";
+import type { CurrentWeather, DailyForecast } from "../../src/types/Weather";
+import { cityLabel, renderCityList, renderDailyForecast, renderWeather } from "../../src/presentation/output";
+import { describeWeatherCode } from "../../src/utils/weatherCodes";
 
 const city: City = {
   id: 3658666,

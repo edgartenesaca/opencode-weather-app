@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { isUnit, nextUnit, toApiUnit, unitSymbol } from "../src/utils/units";
-import { formatDay, formatTemperature, formatTemperatureRange } from "../src/utils/format";
+import { isUnit, nextUnit, toApiUnit, unitSymbol } from "../../src/utils/units";
+import { formatDay, formatTemperature, formatTemperatureRange } from "../../src/utils/format";
 
 describe("units", () => {
   test("reconoce unidades válidas", () => {
