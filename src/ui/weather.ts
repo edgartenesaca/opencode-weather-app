@@ -1,4 +1,5 @@
 import type { City, Unit } from "../types";
+import { cyan, yellow } from "./colors";
 
 const LINE_WIDTH = 40;
 const SEPARATOR = "═".repeat(LINE_WIDTH);
@@ -22,7 +23,7 @@ export function renderMenu(citiesCount: number, unit: Unit): string {
     SEPARATOR,
   ];
 
-  return lines.join("\n");
+  return cyan(lines.join("\n"));
 }
 
 export function renderCityList(cities: City[]): string {
@@ -34,7 +35,7 @@ export function renderWeather(city: City, temperature: number, unit: Unit): stri
   return [
     SEPARATOR,
     `  ${cityLabel(city)}`,
-    `  Temperatura: ${temperature.toFixed(1)} ${unitSymbol(unit)}`,
+    `  Temperatura: ${yellow(`${temperature.toFixed(1)} ${unitSymbol(unit)}`)}`,
     SEPARATOR,
   ].join("\n");
 }

@@ -1,4 +1,5 @@
 import type { Terminal } from "./terminal";
+import { red } from "./colors";
 
 export async function askIndex(
   terminal: Terminal,
@@ -24,7 +25,7 @@ export async function askIndex(
       return index - 1;
     }
 
-    console.log(`  Opción inválida. Ingresa un número entre 1 y ${count}.`);
+    console.log(red(`  Opción inválida. Ingresa un número entre 1 y ${count}.`));
   }
 }
 

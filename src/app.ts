@@ -9,6 +9,7 @@ import {
 } from "./actions";
 import { loadConfig, saveConfig } from "./config";
 import { WeatherError } from "./errors";
+import { green, red } from "./ui/colors";
 import { Terminal } from "./ui/terminal";
 import { renderMenu } from "./ui/weather";
 
@@ -74,14 +75,14 @@ async function dispatch(ctx: AppContext, choice: string): Promise<void> {
         await toggleUnit(ctx);
         break;
       default:
-        console.log("\n  Opción inválida. Intenta de nuevo.\n");
+        console.log(red("\n  Opción inválida. Intenta de nuevo.\n"));
     }
   } catch (error) {
     const message = error instanceof WeatherError ? error.message : "Ocurrió un error inesperado.";
-    console.log(`\n  ${message}\n`);
+    console.log(red(`\n  ${message}\n`));
   }
 }
 
 function goodbye(): void {
-  console.log("\n  ¡Hasta pronto!\n");
+  console.log(green("\n  ¡Hasta pronto!\n"));
 }
