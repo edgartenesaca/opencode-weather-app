@@ -1,7 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import type { City, Config, Unit } from "./types";
+import type { City, Config } from "./types";
+import { isUnit } from "./units";
 
 const APP_FOLDER = "weather-cli";
 const CONFIG_FILE = "config.json";
@@ -40,7 +41,7 @@ export function saveConfig(config: Config): void {
   writeFileSync(path, `${JSON.stringify(config, null, 2)}\n`, "utf8");
 }
 
-function parseConfig(raw: unknown): Config {
+export function parseConfig(raw: unknown): Config {
   if (!isRecord(raw)) {
     return { ...DEFAULT_CONFIG };
   }
@@ -61,10 +62,6 @@ function parseConfig(raw: unknown): Config {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
-}
-
-function isUnit(value: unknown): value is Unit {
-  return value === "celsius" || value === "fahrenheit";
 }
 
 function isCity(value: unknown): value is City {

@@ -1,16 +1,12 @@
-import { getTemperature } from "./api/forecast";
+import { getCurrentWeather } from "./api/forecast";
 import { searchCities } from "./api/geocoding";
+import type { AppContext } from "./context";
 import type { City, Config } from "./types";
+import { nextUnit, unitSymbol } from "./units";
 import { green, red } from "./ui/colors";
 import { askIndex, confirm } from "./ui/prompts";
 import type { Terminal } from "./ui/terminal";
-import { cityLabel, renderCityList, renderWeather, unitSymbol } from "./ui/weather";
-
-export interface AppContext {
-  terminal: Terminal;
-  config: Config;
-  persist: () => void;
-}
+import { cityLabel, renderCityList, renderWeather } from "./ui/weather";
 
 export async function showDefaultWeather(ctx: AppContext): Promise<void> {
   const city = ctx.config.cities.find((item) => item.id === ctx.config.defaultCityId);
@@ -20,8 +16,8 @@ export async function showDefaultWeather(ctx: AppContext): Promise<void> {
     return;
   }
 
-  const temperature = await getTemperature(city, ctx.config.unit);
-  console.log(`\n${renderWeather(city, temperature, ctx.config.unit)}\n`);
+  const weather = await getCurrentWeather(city, ctx.config.unit);
+  console.log(`\n${renderWeather(city, weather, ctx.config.unit)}\n`);
 }
 
 export async function showAllWeather(ctx: AppContext): Promise<void> {
@@ -33,7 +29,7 @@ export async function showAllWeather(ctx: AppContext): Promise<void> {
   }
 
   const results = await Promise.allSettled(
-    cities.map((city) => getTemperature(city, ctx.config.unit)),
+    cities.map((city) => getCurrentWeather(city, ctx.config.unit)),
   );
 
   console.log("");
@@ -83,20 +79,21 @@ export async function searchAndAddCity(ctx: AppContext): Promise<void> {
     return;
   }
 
-  ctx.config.cities.push(city);
-  ctx.persist();
+  ctx.updateConfig({ cities: [...ctx.config.cities, city] });
   console.log(green(`\n  Ciudad agregada: ${cityLabel(city)}\n`));
 }
 
 export async function deleteCity(ctx: AppContext): Promise<void> {
-  if (ctx.config.cities.length === 0) {
-    console.log(red("\n  No hay ciudades registradas.\n"));
+  const cities = ctx.config.cities;
+
+  if (cities.length === 0) {
+    console.log(red("\n  No hay ciudades registradas. Usa la opción 3 para agregar una.\n"));
     return;
   }
 
-  console.log(`\n${renderCityList(ctx.config.cities)}\n`);
-  const index = await askIndex(ctx.terminal, "  Ciudad a eliminar: ", ctx.config.cities.length);
-  const city = index === null ? undefined : ctx.config.cities[index];
+  console.log(`\n${renderCityList(cities)}\n`);
+  const index = await askIndex(ctx.terminal, "  Ciudad a eliminar: ", cities.length);
+  const city = index === null ? undefined : cities[index];
 
   if (!city) {
     console.log(red("\n  Operación cancelada.\n"));
@@ -108,40 +105,40 @@ export async function deleteCity(ctx: AppContext): Promise<void> {
     return;
   }
 
-  ctx.config.cities = ctx.config.cities.filter((item) => item.id !== city.id);
+  ctx.updateConfig({
+    cities: cities.filter((item) => item.id !== city.id),
+    defaultCityId: ctx.config.defaultCityId === city.id ? null : ctx.config.defaultCityId,
+  });
 
-  if (ctx.config.defaultCityId === city.id) {
-    ctx.config.defaultCityId = null;
-  }
-
-  ctx.persist();
   console.log(green(`\n  Ciudad eliminada: ${cityLabel(city)}\n`));
 }
 
 export async function setDefaultCity(ctx: AppContext): Promise<void> {
-  if (ctx.config.cities.length === 0) {
+  const cities = ctx.config.cities;
+
+  if (cities.length === 0) {
     console.log(red("\n  No hay ciudades registradas. Usa la opción 3 para agregar una.\n"));
     return;
   }
 
-  console.log(`\n${renderCityList(ctx.config.cities)}\n`);
-  const index = await askIndex(ctx.terminal, "  Ciudad default: ", ctx.config.cities.length);
-  const city = index === null ? undefined : ctx.config.cities[index];
+  console.log(`\n${renderCityList(cities)}\n`);
+  const index = await askIndex(ctx.terminal, "  Ciudad default: ", cities.length);
+  const city = index === null ? undefined : cities[index];
 
   if (!city) {
     console.log(red("\n  Operación cancelada.\n"));
     return;
   }
 
-  ctx.config.defaultCityId = city.id;
-  ctx.persist();
+  ctx.updateConfig({ defaultCityId: city.id });
   console.log(green(`\n  Ciudad default: ${cityLabel(city)}\n`));
 }
 
 export async function toggleUnit(ctx: AppContext): Promise<void> {
-  ctx.config.unit = ctx.config.unit === "celsius" ? "fahrenheit" : "celsius";
-  ctx.persist();
-  console.log(green(`\n  Unidad de temperatura: ${unitSymbol(ctx.config.unit)}\n`));
+  const unit = nextUnit(ctx.config.unit);
+
+  ctx.updateConfig({ unit });
+  console.log(green(`\n  Unidad de temperatura: ${unitSymbol(unit)}\n`));
 }
 
 async function chooseCity(terminal: Terminal, cities: City[]): Promise<City | null> {

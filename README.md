@@ -20,7 +20,7 @@ El objetivo de esta aplicación es que creemos una aplicación de consola que pi
 
 ```
 https://geocoding-api.open-meteo.com/v1/search?name=Ottawa&count=1&language=es&format=json
-https://api.open-meteo.com/v1/forecast?latitude=45.41117&longitude=-75.69812&current=temperature_2m
+https://api.open-meteo.com/v1/forecast?latitude=45.41117&longitude=-75.69812&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m
 ```
 
 ## Inicializar proyecto
@@ -54,6 +54,19 @@ bun install
 bun run start        # ejecuta la app
 bun run build        # genera el binario ./weather
 bun run typecheck    # bun check
+bun run test         # bun test
+```
+
+### Salida del clima
+
+```
+════════════════════════════════════════
+  Cuenca, Azuay, Ecuador
+  Temperatura: 14.4 °C
+  Clima: 🌦️ Llovizna ligera
+  Humedad: 72%
+  Viento: 9.4 km/h
+════════════════════════════════════════
 ```
 
 ### Configuración

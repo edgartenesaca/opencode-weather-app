@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "start": "bun run index.ts",
+    "test": "bun test",
     "typecheck": "bun check",
     "build": "bun build --compile --outfile weather index.ts",
     "dev": "bun run index.ts --watch"

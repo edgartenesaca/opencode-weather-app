@@ -1,43 +1,54 @@
-import type { City, Unit } from "../types";
+import type { City, CurrentWeather, Unit } from "../types";
+import { unitSymbol } from "../units";
+import { describeWeatherCode } from "../weather-codes";
 import { cyan, yellow } from "./colors";
 
 const LINE_WIDTH = 40;
 const SEPARATOR = "═".repeat(LINE_WIDTH);
 
-export function unitSymbol(unit: Unit): string {
-  return unit === "celsius" ? "°C" : "°F";
+export interface MenuEntry {
+  key: string;
+  label: string;
 }
 
-export function renderMenu(citiesCount: number, unit: Unit): string {
-  const lines = [
-    SEPARATOR,
-    center("WEATHER CLI"),
-    SEPARATOR,
-    "  1. Clima de ciudad default",
-    `  2. Clima de todas las ciudades (${citiesCount})`,
-    "  3. Buscar y agregar ciudad",
-    "  4. Eliminar ciudad",
-    "  5. Establecer ciudad default",
-    `  8. Ajustes (${unitSymbol(unit)})`,
-    "  9. Salir",
-    SEPARATOR,
-  ];
+export function renderMenu(entries: MenuEntry[]): string {
+  const options = entries.map((entry) => `  ${entry.key}. ${entry.label}`);
+  const lines = [SEPARATOR, center("WEATHER CLI"), SEPARATOR, ...options, SEPARATOR];
 
   return cyan(lines.join("\n"));
 }
 
 export function renderCityList(cities: City[]): string {
   const lines = cities.map((city, index) => `  ${index + 1}. ${cityLabel(city)}`);
+
   return lines.join("\n");
 }
 
-export function renderWeather(city: City, temperature: number, unit: Unit): string {
-  return [
+export function renderWeather(city: City, weather: CurrentWeather, unit: Unit): string {
+  const description =
+    weather.weatherCode === undefined ? undefined : describeWeatherCode(weather.weatherCode);
+
+  const lines = [
     SEPARATOR,
     `  ${cityLabel(city)}`,
-    `  Temperatura: ${yellow(`${temperature.toFixed(1)} ${unitSymbol(unit)}`)}`,
-    SEPARATOR,
-  ].join("\n");
+    `  Temperatura: ${yellow(`${weather.temperature.toFixed(1)} ${unitSymbol(unit)}`)}`,
+  ];
+
+  if (description) {
+    lines.push(`  Clima: ${description.icon} ${description.label}`);
+  }
+
+  if (weather.humidity !== undefined) {
+    lines.push(`  Humedad: ${weather.humidity}%`);
+  }
+
+  if (weather.windSpeed !== undefined) {
+    lines.push(`  Viento: ${weather.windSpeed} km/h`);
+  }
+
+  lines.push(SEPARATOR);
+
+  return lines.join("\n");
 }
 
 export function cityLabel(city: City): string {

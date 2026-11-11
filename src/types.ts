@@ -1,4 +1,6 @@
-export type Unit = "celsius" | "fahrenheit";
+import type { Unit } from "./units";
+
+export type { Unit };
 
 export interface City {
   id: number;
@@ -7,6 +9,14 @@ export interface City {
   country: string;
   latitude: number;
   longitude: number;
+}
+
+export interface CurrentWeather {
+  temperature: number;
+  humidity?: number;
+  windSpeed?: number;
+  weatherCode?: number;
+  observedAt?: string;
 }
 
 export interface Config {

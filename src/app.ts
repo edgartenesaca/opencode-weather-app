@@ -1,50 +1,42 @@
-import {
-  deleteCity,
-  searchAndAddCity,
-  setDefaultCity,
-  showAllWeather,
-  showDefaultWeather,
-  toggleUnit,
-  type AppContext,
-} from "./actions";
-import { loadConfig, saveConfig } from "./config";
+import { loadConfig } from "./config";
+import { createContext, type AppContext } from "./context";
 import { WeatherError } from "./errors";
+import { MENU } from "./menu";
 import { green, red } from "./ui/colors";
 import { Terminal } from "./ui/terminal";
-import { renderMenu } from "./ui/weather";
+import { renderMenu, type MenuEntry } from "./ui/weather";
 
 export async function run(): Promise<void> {
-  const config = loadConfig();
   const terminal = new Terminal();
+  const ctx = createContext(terminal, loadConfig());
 
   process.on("SIGINT", () => {
     goodbye();
     process.exit(0);
   });
 
-  const ctx: AppContext = {
-    terminal,
-    config,
-    persist: () => saveConfig(config),
-  };
-
   try {
     while (true) {
       terminal.clearScreen();
-      console.log(renderMenu(config.cities.length, config.unit));
+      console.log(renderMenu(menuEntries(ctx)));
       const choice = await terminal.ask("  Selecciona una opción: ");
 
       if (choice === null) {
         break;
       }
 
-      const option = choice.trim();
+      const option = MENU.find((item) => item.key === choice.trim());
 
-      if (option === "9") {
+      if (!option) {
+        console.log(red("\n  Opción inválida. Intenta de nuevo.\n"));
+        continue;
+      }
+
+      if ("exit" in option) {
         break;
       }
 
-      await dispatch(ctx, option);
+      await runOption(option.action, ctx);
     }
   } finally {
     terminal.close();
@@ -53,34 +45,20 @@ export async function run(): Promise<void> {
   goodbye();
 }
 
-async function dispatch(ctx: AppContext, choice: string): Promise<void> {
+async function runOption(
+  action: (ctx: AppContext) => Promise<void>,
+  ctx: AppContext,
+): Promise<void> {
   try {
-    switch (choice) {
-      case "1":
-        await showDefaultWeather(ctx);
-        break;
-      case "2":
-        await showAllWeather(ctx);
-        break;
-      case "3":
-        await searchAndAddCity(ctx);
-        break;
-      case "4":
-        await deleteCity(ctx);
-        break;
-      case "5":
-        await setDefaultCity(ctx);
-        break;
-      case "8":
-        await toggleUnit(ctx);
-        break;
-      default:
-        console.log(red("\n  Opción inválida. Intenta de nuevo.\n"));
-    }
+    await action(ctx);
   } catch (error) {
     const message = error instanceof WeatherError ? error.message : "Ocurrió un error inesperado.";
     console.log(red(`\n  ${message}\n`));
   }
+}
+
+function menuEntries(ctx: AppContext): MenuEntry[] {
+  return MENU.map((option) => ({ key: option.key, label: option.label(ctx) }));
 }
 
 function goodbye(): void {
