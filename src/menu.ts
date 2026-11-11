@@ -3,6 +3,7 @@ import {
   searchAndAddCity,
   setDefaultCity,
   showAllWeather,
+  showDailyForecast,
   showDefaultWeather,
   toggleUnit,
 } from "./actions";
@@ -31,6 +32,7 @@ export const MENU: MenuOption[] = [
   { key: "3", label: () => "Buscar y agregar ciudad", action: searchAndAddCity },
   { key: "4", label: () => "Eliminar ciudad", action: deleteCity },
   { key: "5", label: () => "Establecer ciudad default", action: setDefaultCity },
+  { key: "6", label: () => "Pronóstico de 7 días", action: showDailyForecast },
   { key: "8", label: (ctx) => `Ajustes (${unitSymbol(ctx.config.unit)})`, action: toggleUnit },
   { key: "9", label: () => "Salir", exit: true },
 ];

@@ -33,7 +33,7 @@ src/weather-codes.ts  WMO code → description/icon
 src/errors.ts         WeatherError
 src/api/client.ts     fetch + timeout + error mapping
 src/api/geocoding.ts  city search
-src/api/forecast.ts   current weather (temperature, humidity, code, wind)
+src/api/forecast.ts   current weather (temperature, humidity, code, wind) + 7-day forecast
 src/ui/terminal.ts    line reader
 src/ui/prompts.ts     index/yes-no prompts
 src/ui/spinner.ts     loading spinner (con fallback estático fuera de TTY)

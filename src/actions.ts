@@ -1,4 +1,4 @@
-import { getCurrentWeather } from "./api/forecast";
+import { getCurrentWeather, getDailyForecast } from "./api/forecast";
 import { searchCities } from "./api/geocoding";
 import type { AppContext } from "./context";
 import type { City, Config } from "./types";
@@ -7,7 +7,7 @@ import { green, red } from "./ui/colors";
 import { askIndex, confirm } from "./ui/prompts";
 import { withSpinner } from "./ui/spinner";
 import type { Terminal } from "./ui/terminal";
-import { cityLabel, renderCityList, renderWeather } from "./ui/weather";
+import { cityLabel, renderCityList, renderWeather, renderDailyForecast } from "./ui/weather";
 
 export async function showDefaultWeather(ctx: AppContext): Promise<void> {
   const city = ctx.config.cities.find((item) => item.id === ctx.config.defaultCityId);
@@ -52,6 +52,30 @@ export async function showAllWeather(ctx: AppContext): Promise<void> {
 
     console.log(red(`  ${cityLabel(city)}: ${errorMessage(result.reason)}`));
   });
+}
+
+export async function showDailyForecast(ctx: AppContext): Promise<void> {
+  const cities = ctx.config.cities;
+
+  if (cities.length === 0) {
+    console.log(red("\n  No hay ciudades registradas. Usa la opción 3 para agregar una.\n"));
+    return;
+  }
+
+  console.log(`\n${renderCityList(cities)}\n`);
+  const index = await askIndex(ctx.terminal, "  Ciudad para el pronóstico: ", cities.length);
+  const city = index === null ? undefined : cities[index];
+
+  if (!city) {
+    console.log(red("\n  Operación cancelada.\n"));
+    return;
+  }
+
+  const days = await withSpinner("Consultando el pronóstico", () =>
+    getDailyForecast(city, ctx.config.unit),
+  );
+
+  console.log(`\n${renderDailyForecast(city, days, ctx.config.unit)}\n`);
 }
 
 export async function searchAndAddCity(ctx: AppContext): Promise<void> {

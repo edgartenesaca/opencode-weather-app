@@ -19,6 +19,13 @@ export interface CurrentWeather {
   observedAt?: string;
 }
 
+export interface DailyForecast {
+  date: string;
+  max: number;
+  min: number;
+  weatherCode?: number;
+}
+
 export interface Config {
   unit: Unit;
   defaultCityId: number | null;
