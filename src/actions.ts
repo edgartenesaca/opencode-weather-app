@@ -5,6 +5,7 @@ import type { City, Config } from "./types";
 import { nextUnit, unitSymbol } from "./units";
 import { green, red } from "./ui/colors";
 import { askIndex, confirm } from "./ui/prompts";
+import { withSpinner } from "./ui/spinner";
 import type { Terminal } from "./ui/terminal";
 import { cityLabel, renderCityList, renderWeather } from "./ui/weather";
 
@@ -16,7 +17,9 @@ export async function showDefaultWeather(ctx: AppContext): Promise<void> {
     return;
   }
 
-  const weather = await getCurrentWeather(city, ctx.config.unit);
+  const weather = await withSpinner("Consultando el clima", () =>
+    getCurrentWeather(city, ctx.config.unit),
+  );
   console.log(`\n${renderWeather(city, weather, ctx.config.unit)}\n`);
 }
 
@@ -28,8 +31,8 @@ export async function showAllWeather(ctx: AppContext): Promise<void> {
     return;
   }
 
-  const results = await Promise.allSettled(
-    cities.map((city) => getCurrentWeather(city, ctx.config.unit)),
+  const results = await withSpinner("Consultando el clima", () =>
+    Promise.allSettled(cities.map((city) => getCurrentWeather(city, ctx.config.unit))),
   );
 
   console.log("");
@@ -60,7 +63,7 @@ export async function searchAndAddCity(ctx: AppContext): Promise<void> {
     return;
   }
 
-  const results = await searchCities(query);
+  const results = await withSpinner("Buscando ciudades", () => searchCities(query));
 
   if (results.length === 0) {
     console.log(red(`\n  No se encontró ninguna ciudad con el nombre "${query}".\n`));

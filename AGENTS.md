@@ -36,6 +36,7 @@ src/api/geocoding.ts  city search
 src/api/forecast.ts   current weather (temperature, humidity, code, wind)
 src/ui/terminal.ts    line reader
 src/ui/prompts.ts     index/yes-no prompts
+src/ui/spinner.ts     loading spinner (con fallback estático fuera de TTY)
 src/ui/weather.ts     menu and weather rendering
 tests/                bun test suites (config, units, menu, renderers)
 ```
@@ -49,6 +50,7 @@ Settings persist in `$XDG_CONFIG_HOME/weather-cli/config.json` (`~/.config/weath
 - Input is read through `src/ui/terminal.ts` (readline `line` events) instead of `readline/promises`, because Bun discards lines typed between questions.
 - Adding a menu option = adding one entry to `MENU` in `src/menu.ts`; the menu rendering and dispatch are driven by that table.
 - Config mutations go through `ctx.updateConfig(patch)`; never mutate `ctx.config` directly.
+- Network calls are wrapped with `withSpinner(text, task)` from `src/ui/spinner.ts` so the UI always shows progress and never leaves a dangling spinner.
 
 
 - Puedes usar @bun-instruction para instrucciones de bun
