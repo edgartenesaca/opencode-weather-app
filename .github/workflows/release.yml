@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install
+
+      # typecheck + tests + binario; si algo falla, no hay release
+      - name: Build
+        run: bun run build
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="v$(jq -r .version package.json)"
+
+          if git rev-parse -q --verify "refs/tags/$VERSION"; then
+            echo "El tag $VERSION ya existe, no se re-publica"
+            exit 0
+          fi
+
+          mv weather "weather-$VERSION-linux-x64"
+          gh release create "$VERSION" "weather-$VERSION-linux-x64" \
+            --title "$VERSION" --generate-notes
