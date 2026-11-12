@@ -25,6 +25,7 @@ describe("addCity", () => {
 
     expect(ctx.updates).toEqual([]);
     expect(plain(consoleSpy.lines)).toContain("Ciudad vacía");
+    
   });
 
   test("avisa si no se encontraron ciudades", async () => {
